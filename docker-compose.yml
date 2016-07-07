@@ -1,0 +1,35 @@
+version: '2'
+
+services:
+    db:
+        image: mysql:latest
+        ports:
+            - 3306
+        volumes:
+            - ./var/docker/mysql:/var/lib/mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: 'root'
+            MYSQL_DATABASE: lamps
+            MYSQL_USER: lamps
+            MYSQL_PASSWORD: lamps
+
+    php:
+        build: etc/docker/php
+        ports:
+            - 8080
+        volumes:
+            - .:/var/www/html
+        links:
+            - db
+        environment:
+            HISTFILE: /var/www/html/var/docker/.bash_history
+            COMPOSER_HOME: /var/www/html/var/docker/composer
+
+    adminer:
+        image: clue/adminer
+        environment:
+            - VIRTUAL_HOST=dev.adminer
+        ports:
+            - 8056:80
+        links:
+            - db:mysql
